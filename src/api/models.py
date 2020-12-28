@@ -5,13 +5,14 @@ from sqlalchemy.orm import relationship
 db = SQLAlchemy()
 
 class Users(db.Model):
+    __tablename__ = 'users' # PARA SOLUCIONAR ERROR DE RELACION
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True)
-    username = db.Column(db.String(60), unique=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    username = db.Column(db.String(60), unique=True, nullable=False)
     first_name = db.Column(db.String(60))
     last_name = db.Column(db.String(120))
-    password = db.Column(db.String(80))
-    is_active = db.Column(db.Boolean())
+    password = db.Column(db.String(80), nullable=False)
+    is_active = db.Column(db.Boolean(), nullable=False)
 
     tweet = db.relationship("Tweets")
 
@@ -31,6 +32,7 @@ class Users(db.Model):
 
 
 class Tweets(db.Model):
+    __tablename__ = 'tweets'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
     text = db.Column(db.String(400))
@@ -39,7 +41,7 @@ class Tweets(db.Model):
     
     def __str__(self):
         # return '<User %r>' % self.username
-        return f'@{self.username}'
+        return f'@{self.user.username}'
 
     def serialize(self):
         return {
