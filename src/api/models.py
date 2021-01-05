@@ -1,12 +1,16 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 db = SQLAlchemy()
 
 class Users(db.Model):
     __tablename__ = 'users' # PARA SOLUCIONAR ERROR DE RELACION
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, server_default=func.now())
+    updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+    deleted_at = db.Column(db.DateTime)
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(60), unique=True, nullable=False)
     first_name = db.Column(db.String(60))
@@ -27,6 +31,8 @@ class Users(db.Model):
             "username": self.username,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "created_at": self.created_at,
+            "update_at": self.updated_at
             
             # do not serialize the password, its a security breach
         }
@@ -35,6 +41,9 @@ class Users(db.Model):
 class Tweets(db.Model):
     __tablename__ = 'tweets'
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, server_default=func.now())
+    updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+    deleted_at = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
     text = db.Column(db.String(400))
 
@@ -56,6 +65,9 @@ class Tweets(db.Model):
 class Comments(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, server_default=func.now())
+    updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+    deleted_at = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
     tweet_id = db.Column(db.Integer, ForeignKey('tweets.id'))
     text = db.Column(db.String(400))
@@ -81,6 +93,8 @@ class Comments(db.Model):
 class Likes(db.Model):
     __tablename__ = 'likes'
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, server_default=func.now()) # NO APLICA UNA MODIFICACION DE UN LIKE
+    deleted_at = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
     tweet_id = db.Column(db.Integer, ForeignKey('tweets.id'))
 
@@ -89,8 +103,8 @@ class Likes(db.Model):
     
     def __str__(self):
         # return '<User %r>' % self.username
-        # return f'@{self.user.username}'
-        return 'Donde cojones sale esto????'
+        return f'@{self.user.username}'
+       
 
     def serialize(self):
         return {

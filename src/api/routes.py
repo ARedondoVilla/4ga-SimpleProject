@@ -1,6 +1,9 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+
+import datetime
+
 from flask import Flask, request, jsonify, url_for, Blueprint, abort
 from api.models import db, Users, Tweets, Comments, Likes
 from api.utils import generate_sitemap, APIException
@@ -13,7 +16,7 @@ def get_all_users():
 
     newList = []
 
-    for user in Users.query.all():
+    for user in Users.query.filter_by(deleted_at=None).all():
         newList.append(user.serialize())
 
     return jsonify(newList), 200
@@ -22,7 +25,7 @@ def get_all_users():
 @api.route('/users/<int:id>', methods=['GET'])
 def get_one_user(id):
 
-    user = Users.query.filter_by(id=id).first()
+    user = Users.query.filter_by(id=id, deleted_at=None).first()
 
     if not user:
         abort(404)
@@ -76,28 +79,28 @@ def delete_user(id):
     
     # BORRADO DE LA BASE DE DATOS (NO RECOMENDADO)
 
-    user = Users.query.get(id)
-
-    if not user:
-        abort(404)
-
-    data = user.serialize()
-
-    db.session.delete(user)
-    db.session.commit()
-
-    return jsonify(data), 200
-
-    # BORRADO LOGICO (RECOMENDADO, NO SE ELIMINA NINGUN DATO DE LA BASE DE DATOS)
-
-    # user = Users.query.filter_by(id=id, deleted_at=None).first()
+    # user = Users.query.get(id)
 
     # if not user:
     #     abort(404)
 
-    # user.deleted_at = datetime.datetime.utcnow()
+    # data = user.serialize()
 
-    # db.session.add(user)
+    # db.session.delete(user)
     # db.session.commit()
 
-    # return jsonify(user.serialize()), 200
+    # return jsonify(data), 200
+
+    # BORRADO LOGICO (RECOMENDADO, NO SE ELIMINA NINGUN DATO DE LA BASE DE DATOS)
+
+    user = Users.query.filter_by(id=id, deleted_at=None).first()
+
+    if not user:
+        abort(404)
+
+    user.deleted_at = datetime.datetime.utcnow()
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify(user.serialize()), 200
