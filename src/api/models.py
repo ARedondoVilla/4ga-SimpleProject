@@ -12,7 +12,6 @@ class Users(db.Model):
     first_name = db.Column(db.String(60))
     last_name = db.Column(db.String(120))
     password = db.Column(db.String(80), nullable=False)
-    is_active = db.Column(db.Boolean(), nullable=False)
 
     tweet = db.relationship("Tweets")
 
@@ -27,7 +26,8 @@ class Users(db.Model):
             "email": self.email,
             "username": self.username,
             "first_name": self.first_name,
-            "last_name": self.last_name
+            "last_name": self.last_name,
+            
             # do not serialize the password, its a security breach
         }
 
