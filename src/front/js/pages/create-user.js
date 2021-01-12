@@ -10,6 +10,14 @@ export const CreateUser = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 
+	const HandleSubmit = e => {
+		console.log({
+			email: email,
+			username: username,
+			password: password
+		});
+	};
+
 	return (
 		<div className="container">
 			<div className="row text-center">
@@ -18,17 +26,32 @@ export const CreateUser = () => {
 			<form>
 				<div className="form-group">
 					<label htmlFor="formGroupExampleInput">Email</label>
-					<input type="email" className="form-control" value={email} />
+					<input
+						type="email"
+						className="form-control"
+						value={email}
+						onChange={e => setEmail(event.target.value)}
+					/>
 				</div>
 				<div className="form-group">
 					<label htmlFor="formGroupExampleInput2">Username</label>
-					<input type="text" className="form-control" value={username} />
+					<input
+						type="text"
+						className="form-control"
+						value={username}
+						onChange={e => setUsername(event.target.value)}
+					/>
 				</div>
 				<div className="form-group">
 					<label htmlFor="formGroupExampleInput2">Password</label>
-					<input type="text" className="form-control" value={password} />
+					<input
+						type="text"
+						className="form-control"
+						value={password}
+						onChange={e => setPassword(event.target.value)}
+					/>
 				</div>
-				<button type="button" className="btn btn-primary">
+				<button type="button" className="btn btn-primary" onClick={HandleSubmit}>
 					Enviar
 				</button>
 			</form>
