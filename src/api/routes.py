@@ -65,7 +65,8 @@ def create_user():
     for field in required:
         if field not in payload or payload[field] is None:
             abort(400)
-
+    
+    print(payload)
     user = Users(**payload)
     
     db.session.add(user)
