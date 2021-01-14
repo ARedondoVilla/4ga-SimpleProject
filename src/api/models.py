@@ -15,7 +15,7 @@ class Users(db.Model):
     username = db.Column(db.String(60), unique=True, nullable=False)
     first_name = db.Column(db.String(60))
     last_name = db.Column(db.String(120))
-    password = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(128), nullable=False) # PASAR USAR EL HASH EN LA CONTRASEÑA TIENE QUE TENER MINIMO 128 CARACTERES
 
     tweet = db.relationship("Tweets")
 

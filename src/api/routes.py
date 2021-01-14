@@ -3,6 +3,8 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 
 import datetime
+import hashlib
+import hmac
 
 from flask import Flask, request, jsonify, url_for, Blueprint, abort
 from api.models import db, Users, Tweets, Comments, Likes
@@ -10,6 +12,7 @@ from api.utils import generate_sitemap, APIException
 
 api = Blueprint('api', __name__)
 
+MAC = "JXXHXzmcXH2ptdCgrBTTUUsru2mx79sb"
 
 @api.route('/users', methods=['GET'])
 def get_all_users():
@@ -46,7 +49,7 @@ def create_user():
 
     # return jsonify(user.serialize()), 201
 
-    # CON VALIDACION DE DATOS
+    # CON VALIDACION DE DATOS Y HASH EN LA CONTRASEÑA
 
     payload= request.get_json()
 
@@ -66,7 +69,14 @@ def create_user():
         if field not in payload or payload[field] is None:
             abort(400)
     
-    print(payload)
+    key = MAC.encode('utf-8')
+    msg = payload['password'].encode('utf-8') # CONTRASEÑA INTRODUCIDA POR EL USUARIO
+    algo = hashlib.sha512 # USAR ESTE ALGORITO O EL sha256
+
+    print("password: ", msg)
+    payload['password'] = hmac.new(key, msg, algo).hexdigest()
+    print("hash: ", payload['password'])
+
     user = Users(**payload)
     
     db.session.add(user)
@@ -74,6 +84,29 @@ def create_user():
 
     return jsonify(user.serialize()), 201
 
+
+@api.route('/login', methods=['POST'])
+def login():
+    payload= request.get_json()
+
+    email = payload['email']
+    password = payload['password']
+
+    user = Users.query.filter_by(email=email, deleted_at=None).first()
+
+    if not user:
+        return "Forbidden", 403
+
+    key = MAC.encode('utf-8')
+    msg = payload['password'].encode('utf-8')
+    algo = hashlib.sha512
+
+    hashed_password = hmac.new(key, msg, algo).hexdigest()
+
+    if hashed_password != user.password:
+        return "Forbidden", 403
+
+    return jsonify(user.serialize()), 201
 
 @api.route("/users/<int:id>", methods =["DELETE"])
 def delete_user(id):

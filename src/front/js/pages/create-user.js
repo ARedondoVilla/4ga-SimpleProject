@@ -6,10 +6,15 @@ import { Context } from "../store/appContext";
 export const CreateUser = () => {
 	const { store, actions } = useContext(Context);
 
-	const [email, setEmail] = useState("");
-	const [username, setUsername] = useState("");
-	const [firstName, setFirstName] = useState("");
-	const [password, setPassword] = useState("");
+	// const [email, setEmail] = useState("");
+	// const [username, setUsername] = useState("");
+	// const [firstName, setFirstName] = useState("");
+	// const [password, setPassword] = useState("");
+
+	const [email, setEmail] = useState("alexredondovilla@gmail.com");
+	const [username, setUsername] = useState("alexredondo");
+	const [firstName, setFirstName] = useState("Alex");
+	const [password, setPassword] = useState("12345");
 
 	const HandleSubmit = e => {
 		const payload = {
@@ -57,7 +62,7 @@ export const CreateUser = () => {
 				<div className="form-group">
 					<label htmlFor={password}>Password</label>
 					<input
-						type="text"
+						type="password"
 						className="form-control"
 						value={password}
 						onChange={e => setPassword(event.target.value)}
