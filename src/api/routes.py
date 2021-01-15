@@ -6,6 +6,8 @@ import datetime
 import hashlib
 import hmac
 
+import jwt
+
 from flask import Flask, request, jsonify, url_for, Blueprint, abort
 from api.models import db, Users, Tweets, Comments, Likes
 from api.utils import generate_sitemap, APIException
@@ -13,6 +15,7 @@ from api.utils import generate_sitemap, APIException
 api = Blueprint('api', __name__)
 
 MAC = "JXXHXzmcXH2ptdCgrBTTUUsru2mx79sb"
+JWT_SECRET = "XLjN2ngDAwwYQUG6x2azgB3vYxLGMuP7"
 
 @api.route('/users', methods=['GET'])
 def get_all_users():
@@ -85,6 +88,34 @@ def create_user():
     return jsonify(user.serialize()), 201
 
 
+def authorized_user():
+    authorization = request.headers['Authorization']
+    
+    if not authorization:
+        abort(403)
+
+    token = authorization[7:] # PARA QUITAR EL BEARER, LO RECORTAR COMO SI FUERA UN STRING
+
+    print(authorization)
+    print(token)
+
+    # AHORA SE DESHACE EL TOKEN PARA OBTENER EL CORREO O ID DEL USUARIO
+    
+    secret = JWT_SECRET.encode('utf-8')
+    algo = "HS256"
+    
+    payload = jwt.decode(token, secret, algorithms=[algo]) # CUANDO SE USA .decode SE USA algorithms Y NO algorithm. .decode => plurar / .encode => singular
+
+    user = Users.query.filter_by(email=payload['sub'], deleted_at=None).first() # CON ESTA LINEA SE DEVUELVE TODA LA INFO DEL USUARIO MEDIANTE EL sub DEL TOKEN
+
+    return user
+
+@api.route('/test', methods=['GET']) # METODO NO NECESARIO, SOLO SE HACE PARA COMPROBAR LA Authorization
+def test():
+    
+    user = authorized_user()
+    return jsonify(user.serialize()), 200          
+
 @api.route('/login', methods=['POST'])
 def login():
     payload= request.get_json()
@@ -105,8 +136,15 @@ def login():
 
     if hashed_password != user.password:
         return "Forbidden", 403
+    
+    # EL CORREO Y CONTRSEÑA SE HA COMPROBADO QUE COINCIDE CON LAS LINEAS ANTERIORES
+    payload = {'sub': user.email}
+    secret = JWT_SECRET.encode('utf-8')
+    algo = "HS256"
 
-    return jsonify(user.serialize()), 201
+    token = jwt.encode(payload, secret, algorithm=algo)
+
+    return jsonify({'token': token}), 201
 
 @api.route("/users/<int:id>", methods =["DELETE"])
 def delete_user(id):

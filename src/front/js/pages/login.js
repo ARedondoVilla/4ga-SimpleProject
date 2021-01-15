@@ -5,14 +5,15 @@ import { Context } from "../store/appContext";
 export const Login = () => {
 	const { store, actions } = useContext(Context);
 
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+	const [email, setEmail] = useState("alexredondovilla@gmail.com");
+	const [password, setPassword] = useState("12345");
 
 	const HandleSubmit = e => {
 		const payload = {
 			email: email,
 			password: password
 		};
+		console.log(payload);
 		actions.userLogin(payload);
 	};
 

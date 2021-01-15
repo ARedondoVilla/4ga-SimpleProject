@@ -1,11 +1,12 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			message: null
+			message: null,
+			token: null
 		},
 		actions: {
 			createUser: data => {
-				const endpoint = "https://3001-ef6fd197-7d44-4852-9aa0-2cc5b328b38e.ws-eu03.gitpod.io/api/users";
+				const endpoint = "https://3001-a8577a9d-5150-4641-8f98-4c0f77437a36.ws-eu03.gitpod.io/api/users";
 				const method = "POST";
 				const config = {
 					method: method,
@@ -19,7 +20,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				});
 			},
 			userLogin: data => {
-				const endpoint = "https://3001-ef6fd197-7d44-4852-9aa0-2cc5b328b38e.ws-eu03.gitpod.io/api/login";
+				const actions = getActions();
+				const endpoint = "https://3001-a8577a9d-5150-4641-8f98-4c0f77437a36.ws-eu03.gitpod.io/api/login";
 				const method = "POST";
 				const config = {
 					method: method,
@@ -27,6 +29,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 						"Content-type": "application/json"
 					},
 					body: JSON.stringify(data)
+				};
+				fetch(endpoint, config)
+					.then(response => response.json())
+					.then(data => {
+						setStore({ token: data.token }); // EL DATA EN ESTA LINEA ES EL CONTENIDO DE LA RESPUESTA (return DE def login() EN routes.py)
+						actions.test();
+					});
+			},
+			test() {
+				const store = getStore();
+				console.log("token: ", store.token);
+				const endpoint = "https://3001-a8577a9d-5150-4641-8f98-4c0f77437a36.ws-eu03.gitpod.io/api/test";
+				const method = "GET";
+				const config = {
+					method: method,
+					headers: {
+						"Content-type": "application/json",
+						Authorization: `Bearer ${store.token}` // CUIDADO CON EL ACENTO, NO ES UNA COMILLA (`)=>OK (')=>NO OK
+						// TODAS LAS PETICIONES QUE DEPENDAN DE UN USUARIO TIENE QUE TENER LA LINEA DE CODIGO 49
+					}
 				};
 				fetch(endpoint, config)
 					.then(response => response.json())
