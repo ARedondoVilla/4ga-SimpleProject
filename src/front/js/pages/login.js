@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
-
+import { useHistory } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 export const Login = () => {
 	const { store, actions } = useContext(Context);
+	const history = useHistory();
 
 	const [email, setEmail] = useState("alexredondovilla@gmail.com");
 	const [password, setPassword] = useState("12345");
 
-	const HandleSubmit = e => {
+	const HandleSubmit = async e => {
 		const payload = {
 			email: email,
 			password: password
 		};
-		console.log(payload);
-		actions.userLogin(payload);
+		// Para pasar del login al perfil vamos a usar las herramientas async y await aqui como en el flux
+		await actions.userLogin(payload);
+		history.push("/profile");
 	};
 
 	return (

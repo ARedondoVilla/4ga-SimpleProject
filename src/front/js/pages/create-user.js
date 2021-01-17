@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import { Context } from "../store/appContext";
 
 export const CreateUser = () => {
 	const { store, actions } = useContext(Context);
+	const history = useHistory();
 
 	// const [email, setEmail] = useState("");
 	// const [username, setUsername] = useState("");
@@ -23,7 +24,10 @@ export const CreateUser = () => {
 			username: username,
 			password: password
 		};
-		actions.createUser(payload);
+		// Para pasar del signup al login vamos a usar una funcion como paramentro llamada callback() en el actions.createUSer
+		actions.createUser(payload, () => {
+			history.push("/login");
+		});
 	};
 
 	return (

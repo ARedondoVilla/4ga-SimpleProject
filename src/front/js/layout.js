@@ -9,6 +9,7 @@ import injectContext from "./store/appContext";
 
 import { CreateUser } from "./pages/create-user";
 import { Login } from "./pages/login";
+import { Profile } from "./pages/profile";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
@@ -33,6 +34,9 @@ const Layout = () => {
 						</Route>
 						<Route exact path="/signup">
 							<CreateUser />
+						</Route>
+						<Route exact path="/profile">
+							<Profile />
 						</Route>
 						<Route exact path="/login">
 							<Login />

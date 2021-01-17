@@ -1,3 +1,5 @@
+const baseUrl = "https://3001-a7922c47-739b-4d6a-b225-83394fcf757e.ws-eu03.gitpod.io/api";
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -5,8 +7,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: null
 		},
 		actions: {
-			createUser: data => {
-				const endpoint = "https://3001-a8577a9d-5150-4641-8f98-4c0f77437a36.ws-eu03.gitpod.io/api/users";
+			createUser: (data, callback) => {
+				const endpoint = `${baseUrl}/users`;
 				const method = "POST";
 				const config = {
 					method: method,
@@ -17,11 +19,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 				fetch(endpoint, config).then(response => {
 					console.log(response);
+					callback();
 				});
 			},
-			userLogin: data => {
+			userLogin: async data => {
 				const actions = getActions();
-				const endpoint = "https://3001-a8577a9d-5150-4641-8f98-4c0f77437a36.ws-eu03.gitpod.io/api/login";
+				const endpoint = `${baseUrl}/login`;
 				const method = "POST";
 				const config = {
 					method: method,
@@ -30,7 +33,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					},
 					body: JSON.stringify(data)
 				};
-				fetch(endpoint, config)
+				await fetch(endpoint, config)
 					.then(response => response.json())
 					.then(data => {
 						setStore({ token: data.token }); // EL DATA EN ESTA LINEA ES EL CONTENIDO DE LA RESPUESTA (return DE def login() EN routes.py)
@@ -40,7 +43,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			test() {
 				const store = getStore();
 				console.log("token: ", store.token);
-				const endpoint = "https://3001-a8577a9d-5150-4641-8f98-4c0f77437a36.ws-eu03.gitpod.io/api/test";
+				const endpoint = `${baseUrl}/test`;
 				const method = "GET";
 				const config = {
 					method: method,
